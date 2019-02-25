@@ -1,0 +1,31 @@
+{
+  "name": "price-checker",
+  "version": "1.0.0",
+  "description": "It is what it is, but will differ in a while.",
+  "main": "app.js",
+  "dependencies": {
+    "eslint": "^5.14.1",
+    "isomorphic-fetch": "^2.2.1",
+    "yarn": "^1.13.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "'echo On'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kboeff/price-checker.git"
+  },
+  "keywords": [
+    "ikea",
+    "price",
+    "track",
+    "node"
+  ],
+  "author": "kbo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kboeff/price-checker/issues"
+  },
+  "homepage": "https://github.com/kboeff/price-checker#readme"
+}
