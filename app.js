@@ -5,9 +5,10 @@ require('./polyfills');
 
 const { DETAILS } = require('./selectors');
 
+const { Movie } = require('./models/product.model');
 
 // Get the products and add them to a queue
-// let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases'
+// let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
 const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases';
 const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-systems/eket', 'living-room-modular-storage-systems/BESTA-system'];
 
@@ -24,6 +25,8 @@ const getProductData = (url) => {
             return require('./dom-parser/index')(html);
         })
         .then((dom) => {
+            const products = Movie.fromHtml(html); // CHANGE THIS ACCORDING TO NEW MODEL ...
+            
             // select all products on the page
             const product = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR);
             const size = dom.window.document.getElementsByClassName(DETAILS.SIZE_SELECTOR);
@@ -37,7 +40,6 @@ const getProductData = (url) => {
                     
                     let spec = productSpecs[props].textContent;
                     if (spec !== undefined) {
-                        // console.log(spec.trim());
                         article.push(spec.trim().replace(/\s\s+/g, ' '));
                     }
                 }
@@ -54,6 +56,7 @@ const getProductData = (url) => {
 
 const crawl = () => {
     let db = [];
+    
     Promise.all([getProductData(productsUrlBase)])
         .then(function(values) {
             db.push(values);
