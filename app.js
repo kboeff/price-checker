@@ -5,7 +5,7 @@ require('./polyfills');
 
 const { DETAILS } = require('./selectors');
 
-const { Movie } = require('./models/product.model');
+const { Product } = require('./models/product.model');
 
 // Get the products and add them to a queue
 // let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
@@ -22,14 +22,11 @@ const getProductData = (url) => {
             return response.text();
         })
         .then((html) => {
-            return require('./dom-parser/index')(html);
-        })
-        .then((dom) => {
-            const products = Movie.fromHtml(html); // CHANGE THIS ACCORDING TO NEW MODEL ...
+            const Products = Product.fromHtml(html); // CHANGE THIS ACCORDING TO NEW MODEL ...
             
             // select all products on the page
-            const product = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR);
-            const size = dom.window.document.getElementsByClassName(DETAILS.SIZE_SELECTOR);
+            const product = dom.window.document.getElementsByClassName(Products.name);
+            const size = dom.window.document.getElementsByClassName(Products.size);
             let article = [];            
             
             for (let i in product) {
