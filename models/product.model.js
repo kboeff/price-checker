@@ -1,4 +1,4 @@
-const initParser = require('./dom-parser');
+const initParser = require('../dom-parser');
 
 const { DETAILS } = require('../selectors');
 
@@ -14,8 +14,10 @@ class Product {
                 .then((dom) => {
                     const name = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR);
                     const size = dom.window.document.getElementsByClassName(DETAILS.SIZE_SELECTOR);
+                    console.log(name, size); //
                     return new Product(name, size);
-                });
+                })
+                .catch(err => console.log("Problem with initParser getting html, error message:", err));
     }
 }
 
