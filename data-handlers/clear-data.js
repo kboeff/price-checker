@@ -14,7 +14,7 @@
 
 module.exports = (names, size) => {
     if(names === undefined || size === undefined || names.length === 0) {
-        return {};
+        return;
     }
     
     let name = [...names];

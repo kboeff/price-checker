@@ -65,8 +65,13 @@ const crawl = () => {
             console.log(db);
         });
     
-    
+    return db;
     
 };
 
-crawl();
+let db = crawl();
+
+for (let obj of db) {
+    console.log(obj.name);
+    
+}
