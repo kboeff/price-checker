@@ -11,6 +11,7 @@ const { Client } = require('pg');
 const client = new Client();
 
 /*
+    schema: "ikea"
     table: "inventory"
     
  *   key   |   name  | description | price | width  | depth | height 
@@ -18,17 +19,23 @@ const client = new Client();
  *  serial | VARCHAR |   TEXT      | FLOAT |   INT  |  INT  |  INT  
  *
  */
- 
- 
- 
- 
- 
+
+
+// Initialize the database if table and schema are missing
 (async () => {
    try {
         await client.connect();
         
-        const res = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT,...');
-        console.log(res.rows[0].message); // Hello world!
+        const checkSchema = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'ikea'");
+        if (!checkSchema.rows) {
+            const schema = await client.query("CREATE SCHEMA ikea");
+        }
+        
+        const checkTable = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'ikea' AND table_name = 'inventory'");
+        if (!checkTable.rows) {
+            const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT, price REAL, width INT, depth INT, height INT)');
+        }
+        
         await client.end();
    } catch (err) {
         console.log(err);   
@@ -92,8 +99,13 @@ const updateDB = () => {
     Promise.all([getProductData(productsUrlBase)])
         .then(function(values) {
             db.push(values);
+            
+            // the db object could be unnecessary
             for(let i in values) {
-                console.log(values[i]);
+                // console.log(values[i]);
+                
+                let record = values[i];
+                console.log(record);
             }
         });
     

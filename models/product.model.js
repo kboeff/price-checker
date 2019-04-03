@@ -12,6 +12,7 @@ class Product {
     static fromHtml(html) {
         return initParser(html)
                 .then((dom) => {
+                    // const selected = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR).parentElement.className;
                     const name = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR);
                     const size = dom.window.document.getElementsByClassName(DETAILS.SIZE_SELECTOR);
                     // console.log(name, size);
