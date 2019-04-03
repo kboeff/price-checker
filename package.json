@@ -8,6 +8,7 @@
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^13.2.0",
     "mongodb": "^3.1.13",
+    "pg": "^7.9.0",
     "yarn": "^1.13.0"
   },
   "devDependencies": {},

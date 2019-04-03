@@ -7,6 +7,34 @@ const { Product } = require('./models/product.model');
 
 const clearData = require('./data-handlers/clear-data');
 
+const { Client } = require('pg');
+const client = new Client();
+
+/*
+    table: "inventory"
+    
+ *   key   |   name  | description | price | width  | depth | height 
+ * --------|---------|-------------|-------|--------|-------|--------
+ *  serial | VARCHAR |   TEXT      | FLOAT |   INT  |  INT  |  INT  
+ *
+ */
+ 
+ 
+ 
+ 
+ 
+(async () => {
+   try {
+        await client.connect();
+        
+        const res = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT,...');
+        console.log(res.rows[0].message); // Hello world!
+        await client.end();
+   } catch (err) {
+        console.log(err);   
+   }
+})();
+
 // Get the products and add them to a queue
 // let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
 const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases';
@@ -44,7 +72,9 @@ const getProductData = (url) => {
                 }
                 sizeSpecs = sizeSpecs.trim().replace(/\s\s+/g, ' ');
                 
-                article.push(clearData(nameSpecs, [sizeSpecs]));
+                if (nameSpecs.length > 0) {
+                    article.push(clearData(nameSpecs, [sizeSpecs]));
+                }
                 
             }
             return article;
@@ -56,22 +86,17 @@ const getProductData = (url) => {
 };
 
 
-const crawl = () => {
+const updateDB = () => {
     let db = [];
     
     Promise.all([getProductData(productsUrlBase)])
         .then(function(values) {
             db.push(values);
-            console.log(db);
+            for(let i in values) {
+                console.log(values[i]);
+            }
         });
-    
-    return db;
     
 };
 
-let db = crawl();
-
-for (let obj of db) {
-    console.log(obj.name);
-    
-}
+updateDB();
