@@ -7,6 +7,8 @@ const { Product } = require('./models/product.model');
 
 const clearData = require('./data-handlers/clear-data');
 
+const makeQuery = require('./db/index');
+
 const { Client } = require('pg');
 const client = new Client();
 
@@ -33,7 +35,7 @@ const client = new Client();
         
         const checkTable = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'ikea' AND table_name = 'inventory'");
         if (!checkTable.rows) {
-            const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT, price REAL, width INT, depth INT, height INT)');
+            const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT, price REAL, width INT, depth INT, height INT, checksum TEXT)');
         }
         
         await client.end();
@@ -94,19 +96,29 @@ const getProductData = (url) => {
 
 
 const updateDB = () => {
+    let props = ['name', 'description', 'price', 'width', 'depth', 'height']; // additional serial key and checksum in DB
     let db = [];
     
     Promise.all([getProductData(productsUrlBase)])
         .then(function(values) {
             db.push(values);
             
-            // the db object could be unnecessary
-            for(let i in values) {
-                // console.log(values[i]);
+            let records = values[0];
+            
+            for(let key in Object.keys(records)) {
+                let record = records[key];
+                let checksum = '';
+                for(let p of props) {
+                    checksum += record[p] || '';
+                }
+                const check = makeQuery('SELECT * FROM inventory WHERE checksum=$1', [checksum]);
                 
-                let record = values[i];
-                console.log(record);
+                // Record not found in db, add.                
+                if (!check.rows) {
+                    makeQuery('INSERT INTO inventory(prod_id, product_name, description, price, width, depth, height, checksum) VALUES ')
+                }
             }
+        
         });
     
 };
