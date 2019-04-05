@@ -6,6 +6,7 @@ require('./polyfills');
 const { Product } = require('./models/product.model');
 
 const clearData = require('./data-handlers/clear-data');
+const priceAlert = require('./data-handlers/price-alert');
 
 // const makeQuery = require('./db/index');
 
@@ -114,7 +115,9 @@ const updateDB = () => {
                 let record = records[key];
                 let checksum = '';
                 for(let p of props) {
-                    checksum += record[p] || '';
+                    if(p !== 'price') {
+                        checksum += record[p] || '';
+                    }
                 }
                
                try {
@@ -124,6 +127,16 @@ const updateDB = () => {
                     if (check.rows.length === 0) {
                         let rows = await client.query('INSERT INTO inventory(product_name, description, price, width, depth, height, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7)', [record.name, record.description, record.price, record.width, record.depth, record.height, checksum]);
                         // console.log(rows); // DEBUG
+                    } else {
+                        // compare prices, signal for changes!
+                        let item = check.rows[0];
+                        // console.log(item);
+                        if (item.price !== record.price) {
+                            priceAlert(item, record.price);
+                            let updateItem = await client.query('UPDATE inventory SET price=$1 WHERE checksum=$2', [record.price, checksum]);
+                            console.log(updateItem);
+            
+                        }
                     }
                } catch (err) {
                    console.log('Query error - checking / inserting items:', err);
@@ -141,3 +154,4 @@ updateDB();
 
 // Handle requests from the front end
 // send records for display
+
