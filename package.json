@@ -4,15 +4,17 @@
   "description": "It is what it is, but will differ in a while.",
   "main": "app.js",
   "dependencies": {
+    "dotenv": "^7.0.0",
     "eslint": "^5.14.1",
     "isomorphic-fetch": "^2.2.1",
-    "jquery": "^3.3.1",
     "jsdom": "^13.2.0",
     "mongodb": "^3.1.13",
+    "pg": "^7.9.0",
     "yarn": "^1.13.0"
   },
   "devDependencies": {},
   "scripts": {
+    "start": "node app.js",
     "test": "'echo On'"
   },
   "repository": {

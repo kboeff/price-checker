@@ -3,11 +3,54 @@
 
 require('./polyfills');
 
-const { DETAILS } = require('./selectors');
+const { Product } = require('./models/product.model');
 
+const clearData = require('./data-handlers/clear-data');
+
+// const makeQuery = require('./db/index');
+
+const { Client } = require('pg');
+const client = new Client();
+
+/*
+    schema: "ikea"
+    table: "inventory"
+    
+ *   key   |   name  | description | price | width  | depth | height 
+ * --------|---------|-------------|-------|--------|-------|--------
+ *  serial | VARCHAR |   TEXT      | FLOAT |   INT  |  INT  |  INT  
+ *
+ */
+console.log(process.env.PGUSER);
+
+// Initialize the database if table and schema are missing
+(async () => {
+   try {
+        await client.connect();
+        console.log('Client connected to db ...')
+        
+        const checkSchema = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ubuntu')");
+        console.log('First query ok');
+        if (!checkSchema.rows[0].exists) {
+            const schema = await client.query("CREATE SCHEMA ubuntu");
+            console.log('Second query ok'); // DEBUG
+        }
+        
+        
+       const checkTable = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ubuntu' AND table_name = 'inventory')");
+       console.log('query ok, returned rows:', checkTable.rows); // DEBUG
+       
+        if (!checkTable.rows[0].exists) {
+            const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT, price REAL, width INT, depth INT, height INT, checksum TEXT)');
+            console.log(table);
+        }
+   } catch (err) {
+        console.log(">>> Error initializing db. >>>", err);   
+   }
+})();
 
 // Get the products and add them to a queue
-// let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases'
+// let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
 const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases';
 const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-systems/eket', 'living-room-modular-storage-systems/BESTA-system'];
 
@@ -20,28 +63,33 @@ const getProductData = (url) => {
             
             return response.text();
         })
-        .then((html) => {
-            return require('./dom-parser/index')(html);
-        })
-        .then((dom) => {
+        .then(async (html) => {
+            const Products = await Product.fromHtml(html); // CHANGE THIS ACCORDING TO NEW MODEL ...
+            
             // select all products on the page
-            const product = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR);
-            const size = dom.window.document.getElementsByClassName(DETAILS.SIZE_SELECTOR);
+            const product = Products.name;
+            const size = Products.size;
+            // console.log(Products, product, size);
             let article = [];            
             
             for (let i in product) {
-                const productSpecs = product[i].children; // name and price
-                const sizeSpecs = size[i].textContent || '';
+                let productSpecs = product[i].children; // name and price
+                let sizeSpecs = size[i].textContent || '';
+                let nameSpecs = [];
                 
                 for (let props in productSpecs) {
                     
                     let spec = productSpecs[props].textContent;
-                    if (spec !== undefined) {
-                        // console.log(spec.trim());
-                        article.push(spec.trim().replace(/\s\s+/g, ' '));
-                    }
+                    if (spec !== undefined && spec !== null) {
+                        nameSpecs.push(spec.trim().replace(/\s\s+/g, ' '));
+                    } 
                 }
-                article.push(sizeSpecs.trim().replace(/\s\s+/g, ' '));
+                sizeSpecs = sizeSpecs.trim().replace(/\s\s+/g, ' ');
+                
+                if (nameSpecs.length > 0) {
+                    article.push(clearData(nameSpecs, [sizeSpecs]));
+                }
+                
             }
             return article;
             
@@ -52,14 +100,44 @@ const getProductData = (url) => {
 };
 
 
-const crawl = () => {
+const updateDB = () => {
+    let props = ['name', 'description', 'price', 'width', 'depth', 'height']; // additional serial key and checksum in DB
     let db = [];
+    
     Promise.all([getProductData(productsUrlBase)])
-        .then(function(values) {
+        .then(async (values) => {
             db.push(values);
-            console.log(db);
+            
+            let records = values[0];
+            
+            for(let key in Object.keys(records)) {
+                let record = records[key];
+                let checksum = '';
+                for(let p of props) {
+                    checksum += record[p] || '';
+                }
+               
+               try {
+                   const check = await client.query('SELECT * FROM inventory WHERE checksum=$1', [checksum]);
+                    // console.log(check); // DEBUG
+                    // Record not found in db, add.                
+                    if (check.rows.length === 0) {
+                        let rows = await client.query('INSERT INTO inventory(product_name, description, price, width, depth, height, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7)', [record.name, record.description, record.price, record.width, record.depth, record.height, checksum]);
+                        // console.log(rows); // DEBUG
+                    }
+               } catch (err) {
+                   console.log('Query error - checking / inserting items:', err);
+               }
+               
+            }
+        
         });
     
-}
+};
 
-crawl();
+
+// Add route for updating db
+updateDB();
+
+// Handle requests from the front end
+// send records for display
