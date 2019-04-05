@@ -4,6 +4,7 @@
   "description": "It is what it is, but will differ in a while.",
   "main": "app.js",
   "dependencies": {
+    "dotenv": "^7.0.0",
     "eslint": "^5.14.1",
     "isomorphic-fetch": "^2.2.1",
     "jsdom": "^13.2.0",

@@ -1,5 +1,13 @@
-const makeQuery = async (text, options) => {
-    return await this.query(text, options);
+// nope
+
+const makeQuery = async (client, text, options) => {
+
+
+    try {
+        return await client.query(text, options);
+    } catch (err) {
+        console.log('Error making the query >>>', err);
+    }
 };
 
 

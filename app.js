@@ -7,7 +7,7 @@ const { Product } = require('./models/product.model');
 
 const clearData = require('./data-handlers/clear-data');
 
-const makeQuery = require('./db/index');
+// const makeQuery = require('./db/index');
 
 const { Client } = require('pg');
 const client = new Client();
@@ -21,26 +21,31 @@ const client = new Client();
  *  serial | VARCHAR |   TEXT      | FLOAT |   INT  |  INT  |  INT  
  *
  */
-
+console.log(process.env.PGUSER);
 
 // Initialize the database if table and schema are missing
 (async () => {
    try {
         await client.connect();
+        console.log('Client connected to db ...')
         
-        const checkSchema = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'ikea'");
-        if (!checkSchema.rows) {
-            const schema = await client.query("CREATE SCHEMA ikea");
+        const checkSchema = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ubuntu')");
+        console.log('First query ok');
+        if (!checkSchema.rows[0].exists) {
+            const schema = await client.query("CREATE SCHEMA ubuntu");
+            console.log('Second query ok'); // DEBUG
         }
         
-        const checkTable = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE  table_schema = 'ikea' AND table_name = 'inventory'");
-        if (!checkTable.rows) {
+        
+       const checkTable = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'ubuntu' AND table_name = 'inventory')");
+       console.log('query ok, returned rows:', checkTable.rows); // DEBUG
+       
+        if (!checkTable.rows[0].exists) {
             const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT, price REAL, width INT, depth INT, height INT, checksum TEXT)');
+            console.log(table);
         }
-        
-        await client.end();
    } catch (err) {
-        console.log(err);   
+        console.log(">>> Error initializing db. >>>", err);   
    }
 })();
 
@@ -100,7 +105,7 @@ const updateDB = () => {
     let db = [];
     
     Promise.all([getProductData(productsUrlBase)])
-        .then(function(values) {
+        .then(async (values) => {
             db.push(values);
             
             let records = values[0];
@@ -111,16 +116,28 @@ const updateDB = () => {
                 for(let p of props) {
                     checksum += record[p] || '';
                 }
-                const check = makeQuery('SELECT * FROM inventory WHERE checksum=$1', [checksum]);
-                
-                // Record not found in db, add.                
-                if (!check.rows) {
-                    makeQuery('INSERT INTO inventory(prod_id, product_name, description, price, width, depth, height, checksum) VALUES ')
-                }
+               
+               try {
+                   const check = await client.query('SELECT * FROM inventory WHERE checksum=$1', [checksum]);
+                    // console.log(check); // DEBUG
+                    // Record not found in db, add.                
+                    if (check.rows.length === 0) {
+                        let rows = await client.query('INSERT INTO inventory(product_name, description, price, width, depth, height, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7)', [record.name, record.description, record.price, record.width, record.depth, record.height, checksum]);
+                        // console.log(rows); // DEBUG
+                    }
+               } catch (err) {
+                   console.log('Query error - checking / inserting items:', err);
+               }
+               
             }
         
         });
     
 };
 
+
+// Add route for updating db
 updateDB();
+
+// Handle requests from the front end
+// send records for display
