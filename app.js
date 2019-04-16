@@ -43,6 +43,7 @@ console.log(process.env.PGUSER);
        
         if (!checkTable.rows[0].exists) {
             const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), description TEXT, price REAL, width INT, depth INT, height INT, checksum TEXT)');
+            const history = await client.query('CREATE TABLE history (prod_id PRIMARY KEY, price_values integer ARRAY)');
             console.log(table);
         }
    } catch (err) {
