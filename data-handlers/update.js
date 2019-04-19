@@ -26,7 +26,7 @@ const updateDB = (productsUrlBase, category) => {
                 }
                
                try {
-                   console.log('are we even trying?');
+                    console.log('are we even trying?');
                     const check = await client.query('SELECT * FROM inventory WHERE checksum=$1', [checksum]);
                     console.log(check.rows, 'if this is empty, INSERT in DB!'); // DEBUG
                     // Record not found in db, add. 
