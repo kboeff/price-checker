@@ -6,6 +6,7 @@ const clearData = require('./clear-data');
 const { Product } = require('../models/product.model');
 
 const getProductData = (url) => {
+    console.log('Fetching data from target site...')
     return fetch(url)
         .then((response) => {
             if(!response.ok) {

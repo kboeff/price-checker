@@ -10,7 +10,7 @@
     "jsdom": "^13.2.0",
     "mongodb": "^3.1.13",
     "pg": "^7.9.0",
-    "yarn": "^1.13.0"
+    "yarn": "^1.15.2"
   },
   "devDependencies": {},
   "scripts": {
