@@ -17,7 +17,6 @@ const client = new Client();
  *  serial | VARCHAR |   TEXT   |   TEXT      | FLOAT |   INT  |  INT  |  INT   | ARRAY   |
  *
  
-   console.log(process.env.PGUSER);
  */
 
 
@@ -54,16 +53,11 @@ const initDB = async () => {
 const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases';
 const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-systems/eket', 'living-room-modular-storage-systems/BESTA-system'];
 
-
-
 // Add route for updating db
 // For testing purposes using IIFE
 (async() => {
     
     await initDB();
-    let testQuery = client.query('SELECT * FROM inventory').then(rows => {
-         console.log(rows);
-    });
     return updateDB(productsUrlBase, categories[0]);
 })();
 
