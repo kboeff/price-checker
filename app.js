@@ -38,7 +38,7 @@ const initDB = async () => {
         */
         
        const checkTable = await client.query("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'inventory')");
-       // console.log('query ok, returned rows:', checkTable.rows); // DEBUG
+       console.log('query ok, returned rows:', checkTable.rows); // DEBUG
        
         if (!checkTable.rows[0].exists) {
             const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), category TEXT, description TEXT, price REAL, width INT, depth INT, height INT, checksum TEXT, history REAL ARRAY)');
@@ -59,8 +59,12 @@ const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-
 // Add route for updating db
 // For testing purposes using IIFE
 (async() => {
+    
     await initDB();
-    updateDB(productsUrlBase, categories[0]);
+    let testQuery = client.query('SELECT * FROM inventory').then(rows => {
+         console.log(rows);
+    });
+    return updateDB(productsUrlBase, categories[0]);
 })();
 
 // Handle requests from the front end
