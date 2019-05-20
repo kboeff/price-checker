@@ -40,7 +40,7 @@ const updateDB = async (productsUrlBase, category) => {
                 if (item.price !== record.price) {
                     priceAlert(item, record.price);
                     let formattedPrice = parseFloat(Math.round(record.price * 100) / 100).toFixed(2);
-                    let txt = "UPDATE inventory SET price=" + formattedPrice + ", history = history||ARRAY[cast(" + formattedPrice +"as real)] WHERE checksum='" + checksum + "::uuid'";
+                    let txt = "UPDATE inventory SET price=" + formattedPrice + ", history = history||ARRAY[cast(" + formattedPrice +"as real)] WHERE checksum='" + md5Checksum + "::uuid'";
                     let updatePrice = await client.query(txt);
                     console.log(updatePrice);
 

@@ -40,7 +40,7 @@ const initDB = async () => {
        console.log('query ok, returned rows:', checkTable.rows); // DEBUG
        
         if (!checkTable.rows[0].exists) {
-            const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), category TEXT, description TEXT, price REAL, width INT, depth INT, height INT, checksum TEXT, history REAL ARRAY)');
+            const table = await client.query('CREATE TABLE inventory (prod_id serial PRIMARY KEY, product_name VARCHAR (50), category TEXT, description TEXT, price REAL, width INT, depth INT, height INT, checksum uuid, history REAL ARRAY)');
             console.log(table);
         }
    } catch (err) {
@@ -50,7 +50,7 @@ const initDB = async () => {
 
 // Get the products and add them to a queue
 // let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
-const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases';
+const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Shelving-units';
 const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-systems/eket', 'living-room-modular-storage-systems/BESTA-system'];
 
 // Add route for updating db
