@@ -50,16 +50,18 @@ const initDB = async () => {
 
 // Get the products and add them to a queue
 // let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
-const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/Shelving-units';
+const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/';
 const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-systems/eket', 'living-room-modular-storage-systems/BESTA-system'];
 
 // Add route for updating db
 // For testing purposes using IIFE
-(async() => {
-    
-    await initDB();
-    return updateDB(productsUrlBase, categories[0]);
-})();
+for(let i in categories) {
+    (async() => {
+        
+        await initDB();
+        return updateDB(productsUrlBase, categories[i]);
+    })();
+}
 
 // Handle requests from the front end
 // send records for display
