@@ -14,7 +14,7 @@ class Product {
                 .then((dom) => {
                     // const selected = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR).parentElement.className;
                     const name = dom.window.document.getElementsByClassName(DETAILS.NAME_SELECTOR);
-                    const size = dom.window.document.getElementsByClassName(DETAILS.SIZE_SELECTOR);
+                    const size = dom.window.document.getElementsByClassName(DETAILS.CAT_NUMBER_SELECTOR);
                     // console.log(name, size);
                     return new Product(name, size);
                 })

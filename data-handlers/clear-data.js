@@ -12,6 +12,10 @@
  *
 */
 
+// !!!!!!!!!!!
+// <div class="productTile active" data-id="11438" 
+// data-product="30275564" data-product-data="[{"productRetailerPartNo":"30275564","productPriceAmount":100.00,"productOriginalPriceAmount":100.00,"productPriceCurrency":"BGN","productTitle":"стъклена врата","productCategory":"Врати BILLY","productQuantity":1}]" data-variant-fbq="[{"content_name":"стъклена врата","content_category":"Врати BILLY","content_ids":["30275564"],"content_type":"product","value":100.00,"currency":"BGN"}]">
+
 module.exports = (names, size) => {
     if(names === undefined || size === undefined || names.length === 0) {
         return;

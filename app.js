@@ -56,6 +56,8 @@ const initDB = async () => {
 
 const rooms = ['https://www.ikea.bg/rooms/living-room/', 'https://www.ikea.bg/rooms/kitchen/'];
 const categories = [];
+const productsPerPage = '?sort=Default&pz=100&pg=1'; //
+
 
 
 const fillCategories = async () => {
@@ -65,14 +67,12 @@ const fillCategories = async () => {
         
     }
     console.log('categories', categories);
-    
+    await initDB();
     
     // Add route for updating db
-    // For testing purposes using IIFE
     for (let categoryUrl of categories) {
-            await initDB();
-            updateDB(categoryUrl);
-
+        updateDB(categoryUrl + productsPerPage);
+            // TODO: function to check if products are more than 100 and add updateDB(url+pg=2,3,etc.) in a loop
     }
 }
 
