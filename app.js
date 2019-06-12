@@ -3,6 +3,8 @@
 
 require('./polyfills');
 
+const getCategories = require('./data-handlers/get-categories')
+
 const updateDB = require('./data-handlers/update');
 const { Client } = require('pg');
 const client = new Client();
@@ -49,20 +51,33 @@ const initDB = async () => {
 };
 
 // Get the products and add them to a queue
-// let fullUrl = 'https://www.ikea.bg/living-room/Living-room-storage/Bookcases/?pg=2' << add page untill we get error.
-const productsUrlBase = 'https://www.ikea.bg/living-room/Living-room-storage/';
-const categories = ['Bookcases', 'Shelving-units', 'living-room-modular-storage-systems/eket', 'living-room-modular-storage-systems/BESTA-system'];
+// New site structure - now there is division by rooms like this: https://www.ikea.bg/rooms/living-room/...
 
-// Add route for updating db
-// For testing purposes using IIFE
-for(let i in categories) {
-    (async() => {
+
+const rooms = ['https://www.ikea.bg/rooms/living-room/', 'https://www.ikea.bg/rooms/kitchen/'];
+const categories = [];
+
+
+const fillCategories = async () => {
+    for (let room of rooms) {
+       let result = await getCategories(room);
+       categories.push(...result)
         
-        await initDB();
-        return updateDB(productsUrlBase, categories[i]);
-    })();
+    }
+    console.log('categories', categories);
+    
+    
+    // Add route for updating db
+    // For testing purposes using IIFE
+    for (let categoryUrl of categories) {
+            await initDB();
+            updateDB(categoryUrl);
+
+    }
 }
+
+fillCategories();
+
 
 // Handle requests from the front end
 // send records for display
-

@@ -5,11 +5,11 @@ const crypto = require('crypto');
 
 const client = new Client;
 
-const updateDB = async (productsUrlBase, category) => {
+const updateDB = async (productsUrl) => {
     // connect to db
     await client.connect();
-    const records = await getProductData(productsUrlBase+category);
-
+    const records = await getProductData(productsUrl);
+    const category = productsUrl.split('/').slice(-1);
     for (const record of records) {
 
         let checksum = '';
