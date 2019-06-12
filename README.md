@@ -17,4 +17,3 @@ Steps:
 2. Run >'sudo -u psql username'
       = \password username
 
-Done. (maybe, between step 1 and 2 tried a lot of stuff, some could influenced the outcome and didn't notice)
