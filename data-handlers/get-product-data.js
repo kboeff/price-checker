@@ -17,16 +17,17 @@ const getProductData = (url) => {
         })
         .then(async (html) => {
             const Products = await Product.fromHtml(html); // CHANGE THIS ACCORDING TO NEW MODEL ...
-            
-            // select all products on the page
-            const product = Products.name;
-            const size = Products.size;
-            // console.log(Products, product, size);
+           
+            let products = clearData(Product);
+            // so far, so good - we need array of products with name, desc and price each
+           
             let article = [];            
             
-            for (let i in product) {
-                let productSpecs = product[i].children; // name and price
-                let sizeSpecs = size[i].textContent || '';
+            for (let i = 0; i < len; i++) {
+                let product = clearData(Product);
+                
+                let productSpecs = product[i].children; // name and price 
+                let sizeSpecs = details[i].textContent || '';
                 let nameSpecs = [];
                 
                 for (let props in productSpecs) {
