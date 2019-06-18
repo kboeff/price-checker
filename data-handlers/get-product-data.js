@@ -19,11 +19,10 @@ const getProductData = (url) => {
             const Products = await Product.fromHtml(html); // CHANGE THIS ACCORDING TO NEW MODEL ...
            
             let products = clearData(Product);
-            // so far, so good - we need array of products with name, desc and price each
            
             let article = [];            
             
-            for (let i = 0; i < len; i++) {
+            for (let i = 0; i < products.length; i++) {
                 let product = clearData(Product);
                 
                 let productSpecs = product[i].children; // name and price 
